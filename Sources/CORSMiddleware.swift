@@ -11,7 +11,7 @@ import S4
 struct CORSMiddleware: Middleware {
     func respond(to request: Request, chainingTo chain: Responder) throws -> Response {
         var response = try chain.respond(to: request)
-        response.headers.headers["access-control-allow-origin"] = Header("*")
+        response.headers.headers["access-control-allow-origin"] = "*"
         return response
     }
 }
