@@ -1,24 +1,21 @@
 import HTTPServer
 import Router
-import Resource
-import JSONMediaType
 import LogMiddleware
-import StandardOutputAppender
 
-//MARK: Middleware
+// Middleware
 let cors = CORSMiddleware()
-let log = LogMiddleware(logger: Logger(name: "log", appender: StandardOutputAppender()))
+let log = LogMiddleware(logger: Logger())
 
-//MARK: Storage
+// Storage
 let store = InMemoryTodoStore()
 
-//MARK: Resources
+// Resources
 let todoResource = makeTodoResource(store: store)
 
-//MARK: Main router
+// Main router
 let router = Router(middleware: cors) { route in
-    route.resources(path: "/", resources: todoResource)
+    route.compose("/todos", router: todoResource)
 }
 
-//MARK: Server
+// Server
 try Server(middleware: log, responder: router).start()
