@@ -26,6 +26,9 @@ import HTTPServer
 import Router
 import LogMiddleware
 
+// Configuration
+let apiRoot = "http://127.0.0.1:8080/"
+
 // Middleware
 let cors = CORSMiddleware()
 let log = LogMiddleware(logger: Logger())

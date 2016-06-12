@@ -25,23 +25,7 @@
 import Resource
 import JSONMediaType
 
-// MOVE TO STRUCTURED DATA
-extension Sequence where Iterator.Element: StructuredDataRepresentable {
-    public var structuredData: StructuredData {
-        return .array(self.map { $0.structuredData })
-    }
-}
-
-extension StructuredData {
-    public func get<T>(optional: String) -> T? {
-        return try? get(optional) as T
-    }
-}
-
-
 func makeTodoResource(store todoStore: TodoStore) -> Resource {
-
-    let apiRoot = "http://127.0.0.1:8080"
 
     return Resource(mediaTypes: JSONMediaType()) { todo in
 
