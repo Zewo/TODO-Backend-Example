@@ -37,10 +37,8 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
 
         // POST /
         todo.post { (request: Request, todo: Todo) in
-            let id = todoStore.nextId()
-            let newTodo = todo.modify(id: id, url: "\(apiRoot)/\(id)")
-            todoStore.insert(todo: newTodo, id: id)
-            return Response(content: newTodo)
+            let inserted = todoStore.insert(todo: todo)
+            return Response(content: inserted)
         }
 
         // DELETE /
@@ -62,7 +60,7 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
             guard let oldTodo = todoStore.get(id: id) else {
                 return Response(status: .notFound)
             }
-            let newTodo = todoStore.update(id: id, todo: oldTodo.modify(content: update))
+            let newTodo = todoStore.update(id: id, todo: oldTodo.item.update(content: update))
             return Response(content: newTodo)
         }
 

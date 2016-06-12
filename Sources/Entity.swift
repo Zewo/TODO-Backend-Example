@@ -1,4 +1,4 @@
-// Todo.swift
+// Entity.swift
 //
 // The MIT License (MIT)
 //
@@ -22,47 +22,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Mapper
-import Resource
+import StructuredData
 
-struct Todo {
-    let title: String
-    let completed: Bool
-    let order: Int
-}
+struct Entity<Item: StructuredDataConvertible> {
+    let id: Int
+    let url: String
+    let item: Item
 
-extension Todo {
-    func update(title: String? = nil, completed: Bool? = nil, order: Int? = nil) -> Todo {
-        return self.dynamicType.init(
-            title: title ?? self.title,
-            completed: completed ?? self.completed,
-            order: order ?? self.order
-        )
-    }
-
-    func update(content: StructuredData) -> Todo {
-        return self.update(
-            title: content.get(optional: "title"),
-            completed: content.get(optional: "completed"),
-            order: (content.get(optional: "order") as Double?).map(Int.init)
-        )
+    init(id: Int, url: String? = nil, item: Item) {
+        self.id = id
+        self.url = url ?? "\(apiRoot)\(id)"
+        self.item = item
     }
 }
 
-extension Todo: ContentMappable, StructuredDataConvertible {
-    init(mapper: Mapper) throws {
-        try self.init(
-            title: mapper.map(from: "title"),
-            completed: mapper.map(optionalFrom: "completed") ?? false,
-            order: (mapper.map(optionalFrom: "order") as Double?).map(Int.init) ?? 0
-        )
-    }
-
+extension Entity: StructuredDataConvertible {
     var structuredData: StructuredData {
-        return [
-           "title": .infer(title),
-           "completed": .infer(completed),
-           "order": .infer(order)
-        ]
+        var dict = item.structuredData.dictionaryValue!
+        dict["id"] = .infer(id)
+        dict["url"] = .infer(url)
+        return .infer(dict)
+    }
+
+    init(structuredData data: StructuredData) throws {
+        try self.init(
+            id: data.get("id"),
+            url: data.get("url"),
+            item: data.get()
+        )
     }
 }

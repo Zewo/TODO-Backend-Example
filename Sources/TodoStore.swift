@@ -23,57 +23,49 @@
 // SOFTWARE.
 
 protocol TodoStore {
-    func nextId() -> Int
+    func get(id: Int) -> Entity<Todo>?
+    func getAll() -> [Entity<Todo>]
 
-    func get(id: Int) -> Todo?
-    func getAll() -> [Todo]
+    func insert(todo: Todo) -> Entity<Todo>
 
-    func insert(todo: Todo, id: Int)
+    func update(id: Int, todo: Todo) -> Entity<Todo>
 
-    func update(id: Int, todo: Todo) -> Todo
-
-    func remove(id: Int) -> Todo?
-    func clear() -> [Todo]
+    func remove(id: Int) -> Entity<Todo>?
+    func clear() -> [Entity<Todo>]
 }
 
 final class InMemoryTodoStore: TodoStore {
     private var idCounter = 0
-    private var storage = [Int:Todo]()
+    private var storage = [Int:Entity<Todo>]()
 
-    func getAll() -> [Todo] {
+    func getAll() -> [Entity<Todo>] {
         return Array(storage.values)
     }
 
-    func get(id: Int) -> Todo? {
-        return self.storage[id]
+    func get(id: Int) -> Entity<Todo>? {
+        return storage[id]
     }
 
-    func nextId() -> Int {
+    func insert(todo: Todo) -> Entity<Todo> {
         defer { idCounter += 1 }
-        return idCounter
+        let entity = Entity(id: idCounter, url: "\(apiRoot)\(idCounter)", item: todo)
+        storage[idCounter] = entity
+        return entity
     }
 
-    func insert(todo: Todo, id: Int) {
-        self.storage[id] = todo
+    func update(id: Int, todo: Todo) -> Entity<Todo> {
+        let entity = Entity(id: id, item: todo)
+        storage[id] = entity
+        return entity
     }
 
-    func update(id: Int, todo: Todo) -> Todo {
-        let new = Todo(id: id, url: todo.url, title: todo.title, completed: todo.completed, order: todo.order)
-
-        self.storage[id] = new
-
-        return new
+    func remove(id: Int) -> Entity<Todo>? {
+        defer { storage[id] = nil }
+        return storage[id]
     }
 
-    func remove(id: Int) -> Todo? {
-        let todo = storage[id]
-        storage[id] = nil
-        return todo
-    }
-
-    func clear() -> [Todo] {
-        let deleted = storage.values
-        self.storage = [:]
-        return Array(deleted)
+    func clear() -> [Entity<Todo>] {
+        defer { self.storage = [:] }
+        return Array(storage.values)
     }
 }
