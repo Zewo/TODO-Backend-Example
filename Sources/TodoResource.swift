@@ -29,25 +29,25 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
 
     return Resource(mediaTypes: JSONMediaType()) { todo in
 
-        // GET /
+        // GET all todos
         todo.get { request in
             let todos = todoStore.getAll()
             return Response(content: todos.structuredData)
         }
 
-        // POST /
+        // POST a new todo
         todo.post { (request: Request, todo: Todo) in
             let inserted = todoStore.insert(todo: todo)
             return Response(content: inserted)
         }
 
-        // DELETE /
+        // DELETE all todos
         todo.delete { request in
             let deleted = todoStore.clear()
             return Response(content: deleted.structuredData)
         }
 
-        // GET /:id
+        // GET a todo
         todo.get { (request: Request, id: Int) in
             guard let todo = todoStore.get(id: id) else {
                 return Response(status: .notFound)
@@ -55,7 +55,7 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
             return Response(content: todo)
         }
 
-        // PATCH /:id
+        // PATCH a todo
         todo.patch { (request: Request, id: Int, update: StructuredData) in
             guard let oldTodo = todoStore.get(id: id) else {
                 return Response(status: .notFound)
@@ -64,7 +64,7 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
             return Response(content: newTodo)
         }
 
-        // DELETE /:id
+        // DELETE a todo
         todo.delete { (request: Request, id: Int) in
             guard let removed = todoStore.remove(id: id) else {
                 return Response(status: .noContent)
@@ -72,15 +72,15 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
             return Response(content: removed)
         }
 
-        // OPTIONS
-        // /
+        // OPTIONS for /
         todo.options { request in
             return Response(headers: [
                 "Access-Control-Allow-Headers": "accept, content-type",
                 "Access-Control-Allow-Methods": "OPTIONS,GET,POST,DELETE"
             ])
         }
-        // /:id
+
+        // OPTIONS for /:id
         todo.options("/:id") { request in
             return Response(headers: [
                  "Access-Control-Allow-Headers": "accept, content-type",
