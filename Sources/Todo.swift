@@ -44,7 +44,7 @@ extension Todo {
         return self.update(
             title: content.get(optional: "title"),
             completed: content.get(optional: "completed"),
-            order: (content.get(optional: "order") as Double?).map(Int.init)
+            order: content.get(optional: "order")
         )
     }
 }
@@ -54,7 +54,7 @@ extension Todo: ContentMappable, StructuredDataConvertible {
         try self.init(
             title: mapper.map(from: "title"),
             completed: mapper.map(optionalFrom: "completed") ?? false,
-            order: (mapper.map(optionalFrom: "order") as Double?).map(Int.init) ?? 0
+            order: mapper.map(optionalFrom: "order") ?? 0
         )
     }
 
