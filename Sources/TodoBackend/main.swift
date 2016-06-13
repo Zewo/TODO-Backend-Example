@@ -27,7 +27,9 @@ import Router
 import LogMiddleware
 
 // Configuration
-let apiRoot = "http://127.0.0.1:8080/"
+let apiRoot = getenv("API_ROOT") == nil
+    ? "http://127.0.0.1:8080/" // if API_ROOT is not defined, default to localhost
+    : String(validatingUTF8: getenv("API_ROOT"))!
 
 // Middleware
 let cors = CORSMiddleware()
