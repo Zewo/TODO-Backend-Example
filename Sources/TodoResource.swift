@@ -29,25 +29,25 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
 
     return Resource(mediaTypes: JSONMediaType()) { todo in
 
-        // GET all todos
+        // GET / (get all todos)
         todo.get { request in
             let todos = todoStore.getAll()
             return Response(content: todos.structuredData)
         }
 
-        // POST a new todo
+        // POST / (create a new todo)
         todo.post { (request: Request, todo: Todo) in
             let inserted = todoStore.insert(todo: todo)
             return Response(content: inserted)
         }
 
-        // DELETE all todos
+        // DELETE / (delete all todos)
         todo.delete { request in
             let deleted = todoStore.clear()
             return Response(content: deleted.structuredData)
         }
 
-        // GET a todo
+        // GET /:id (get a todo)
         todo.get { (request: Request, id: Int) in
             guard let todo = todoStore.get(id: id) else {
                 return Response(status: .notFound)
@@ -55,7 +55,7 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
             return Response(content: todo)
         }
 
-        // PATCH a todo
+        // PATCH /:id (modify a todo)
         todo.patch { (request: Request, id: Int, update: StructuredData) in
             guard let oldTodo = todoStore.get(id: id) else {
                 return Response(status: .notFound)
@@ -64,7 +64,7 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
             return Response(content: newTodo)
         }
 
-        // DELETE a todo
+        // DELETE /:id (delete a todo)
         todo.delete { (request: Request, id: Int) in
             guard let removed = todoStore.remove(id: id) else {
                 return Response(status: .noContent)
@@ -72,7 +72,7 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
             return Response(content: removed)
         }
 
-        // OPTIONS for /
+        // OPTIONS /
         todo.options { request in
             return Response(headers: [
                 "Access-Control-Allow-Headers": "accept, content-type",
@@ -80,7 +80,7 @@ func makeTodoResource(store todoStore: TodoStore) -> Resource {
             ])
         }
 
-        // OPTIONS for /:id
+        // OPTIONS /:id
         todo.options("/:id") { request in
             return Response(headers: [
                  "Access-Control-Allow-Headers": "accept, content-type",
