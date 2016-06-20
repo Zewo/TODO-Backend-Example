@@ -1,7 +1,7 @@
 # Todo Backend
 [![Swift 3.0](https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Zewo](https://img.shields.io/badge/Zewo-0.7-FF7565.svg?style=flat)](http://zewo.io) [![Platforms Mac - Linux](https://img.shields.io/badge/Platforms-OS%20X%20--%20Linux-lightgray.svg?style=flat)](https://developer.apple.com/swift/) [![License MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)](https://tldrlegal.com/license/mit-license) [![Slack Status](https://zewo-slackin.herokuapp.com/badge.svg)](http://slack.zewo.io)
 
-This repository contains an implementation of a Todo Backend created using Zewo components.
+This repository contains an implementation of Todo Backend created using Zewo components.
 
 > The Todo-Backend project helps showcase and compare different language and framework combinations for building web services. This website defines a simple web API in the form of a todo list and users can create their own identical APIs using various tech stacks. This website then provides a spec runner to verify that the user implementation is identical to the base implementation.
 
