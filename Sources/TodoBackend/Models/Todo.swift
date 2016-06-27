@@ -24,6 +24,7 @@
 
 import Mapper
 import Resource
+import SQL
 
 struct Todo {
     let title: String
@@ -64,6 +65,35 @@ extension Todo: ContentMappable, StructuredDataConvertible {
            "title": .infer(title),
            "completed": .infer(completed),
            "order": .infer(order)
+        ]
+    }
+}
+
+extension Todo: SQL.ModelProtocol {
+    typealias PrimaryKey = Int
+    
+    enum Field: String, ModelField {
+        case id
+        case title
+        case completed
+        case order
+        
+        static let primaryKey = Field.id
+        
+        static let tableName = "todos"
+    }
+    
+    init<Row: RowProtocol>(row: TableRow<Todo, Row>) throws {
+        title = try row.value(.title)
+        completed = try row.value(.completed) == 1 ? true : false
+        order = try row.value(.order)
+    }
+    
+    func serialize() -> [Field : ValueConvertible?] {
+        return [
+                   .title: title,
+                   .completed: completed ? 1 : 0,
+                   .order: order
         ]
     }
 }
