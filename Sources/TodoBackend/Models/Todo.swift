@@ -24,20 +24,12 @@ extension Todo {
     }
 }
 
-extension Todo : MapInitializable, MapRepresentable {
+extension Todo : MapConvertible {
     init(map: Map) throws {
         try self.init(
             title: map.get("title"),
             completed: map["completed"].bool ?? false,
             order: map["order"].int ?? 0
         )
-    }
-
-    var map: Map {
-        return [
-           "title": Map(title),
-           "completed": Map(completed),
-           "order": Map(order)
-        ]
     }
 }

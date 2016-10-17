@@ -1,6 +1,6 @@
 import Axis
 
-struct Entity<Item> where Item : MapInitializable, Item : MapRepresentable {
+struct Entity<Item : MapConvertible> {
     let id: Int
     let url: String
     let item: Item
@@ -12,9 +12,9 @@ struct Entity<Item> where Item : MapInitializable, Item : MapRepresentable {
     }
 }
 
-extension Entity : MapInitializable, MapRepresentable {
-    var map: Map {
-        var dict = item.map.dictionary!
+extension Entity : MapConvertible {
+    func asMap() throws -> Map {
+        var dict = try item.asMap().asDictionary()
         dict["id"] = Map(id)
         dict["url"] = Map(url)
         return Map(dict)

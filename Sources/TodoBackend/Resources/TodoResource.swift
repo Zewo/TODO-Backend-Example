@@ -7,13 +7,13 @@ struct TodoResource : Resource {
     // GET / (get all todos)
     func list(request: Request) throws -> Response {
         let todos = store.getAll()
-        return Response(content: todos)
+        return try Response(content: todos)
     }
 
     // POST / (create a new todo)
     func create(request: Request, content todo: Todo) throws -> Response {
         let inserted = store.insert(todo: todo)
-        return Response(content: inserted)
+        return try Response(content: inserted)
     }
 
     // GET /:id (get a todo)
@@ -21,7 +21,7 @@ struct TodoResource : Resource {
         guard let todo = store.get(id: id) else {
             return Response(status: .notFound)
         }
-        return Response(content: todo)
+        return try Response(content: todo)
     }
 
     // PATCH /:id (modify a todo)
@@ -30,7 +30,7 @@ struct TodoResource : Resource {
             return Response(status: .notFound)
         }
         let newTodo = store.update(id: id, todo: oldTodo.item.update(map: update))
-        return Response(content: newTodo)
+        return try Response(content: newTodo)
     }
 
     // DELETE /:id (delete a todo)
@@ -38,13 +38,13 @@ struct TodoResource : Resource {
         guard let removed = store.remove(id: id) else {
             return Response(status: .noContent)
         }
-        return Response(content: removed)
+        return try Response(content: removed)
     }
 
     // DELETE / (delete all todos)
     func clear(request: Request) throws -> Response {
         let deleted = store.clear()
-        return Response(content: deleted)
+        return try Response(content: deleted)
     }
 
     func custom(routes: ResourceRoutes) {
