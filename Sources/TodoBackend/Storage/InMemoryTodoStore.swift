@@ -22,7 +22,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-final class InMemoryTodoStore: TodoStore {
+final class InMemoryTodoStore : TodoStore {
     private var idCounter = 0
     private var storage = [Int:Entity<Todo>]()
 

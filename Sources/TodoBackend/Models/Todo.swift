@@ -22,8 +22,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Mapper
-import Resource
+import Axis
 
 struct Todo {
     let title: String
@@ -33,37 +32,36 @@ struct Todo {
 
 extension Todo {
     func update(title: String? = nil, completed: Bool? = nil, order: Int? = nil) -> Todo {
-        return self.dynamicType.init(
+        return Todo.init(
             title: title ?? self.title,
             completed: completed ?? self.completed,
             order: order ?? self.order
         )
     }
 
-    func update(content: StructuredData) -> Todo {
-        let mapper = Mapper(structuredData: content)
+    func update(map: Map) -> Todo {
         return self.update(
-            title: mapper.map(optionalFrom: "title"),
-            completed: mapper.map(optionalFrom: "completed"),
-            order: mapper.map(optionalFrom: "order")
+            title: map["title"].string,
+            completed: map["completed"].bool,
+            order: map["order"].int
         )
     }
 }
 
-extension Todo: ContentMappable, StructuredDataConvertible {
-    init(mapper: Mapper) throws {
+extension Todo : MapInitializable, MapRepresentable {
+    init(map: Map) throws {
         try self.init(
-            title: mapper.map(from: "title"),
-            completed: mapper.map(optionalFrom: "completed") ?? false,
-            order: mapper.map(optionalFrom: "order") ?? 0
+            title: map.get("title"),
+            completed: map["completed"].bool ?? false,
+            order: map["order"].int ?? 0
         )
     }
 
-    var structuredData: StructuredData {
+    var map: Map {
         return [
-           "title": .infer(title),
-           "completed": .infer(completed),
-           "order": .infer(order)
+           "title": Map(title),
+           "completed": Map(completed),
+           "order": Map(order)
         ]
     }
 }

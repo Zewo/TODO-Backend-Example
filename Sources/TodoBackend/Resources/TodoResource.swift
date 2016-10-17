@@ -22,69 +22,69 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Resource
-import JSONMediaType
+import HTTPServer
 
-func makeTodoResource(store todoStore: TodoStore) -> Resource {
+struct TodoResource : Resource {
+    let store: TodoStore
+    let middleware: [Middleware] = [ContentNegotiationMiddleware(mediaTypes: [.json])]
 
-    return Resource(mediaTypes: JSONMediaType()) { todo in
+    // GET / (get all todos)
+    func list(request: Request) throws -> Response {
+        let todos = store.getAll()
+        return Response(content: todos)
+    }
 
-        // GET / (get all todos)
-        todo.get { request in
-            let todos = todoStore.getAll()
-            return Response(content: todos.structuredData)
+    // POST / (create a new todo)
+    func create(request: Request, content todo: Todo) throws -> Response {
+        let inserted = store.insert(todo: todo)
+        return Response(content: inserted)
+    }
+
+    // GET /:id (get a todo)
+    func detail(request: Request, id: Int) throws -> Response {
+        guard let todo = store.get(id: id) else {
+            return Response(status: .notFound)
         }
+        return Response(content: todo)
+    }
 
-        // POST / (create a new todo)
-        todo.post { (request: Request, todo: Todo) in
-            let inserted = todoStore.insert(todo: todo)
-            return Response(content: inserted)
+    // PATCH /:id (modify a todo)
+    func update(request: Request, id: Int, content update: Map) throws -> Response {
+        guard let oldTodo = store.get(id: id) else {
+            return Response(status: .notFound)
         }
+        let newTodo = store.update(id: id, todo: oldTodo.item.update(map: update))
+        return Response(content: newTodo)
+    }
 
-        // DELETE / (delete all todos)
-        todo.delete { request in
-            let deleted = todoStore.clear()
-            return Response(content: deleted.structuredData)
+    // DELETE /:id (delete a todo)
+    func destroy(request: Request, id: Int) throws -> Response {
+        guard let removed = store.remove(id: id) else {
+            return Response(status: .noContent)
         }
+        return Response(content: removed)
+    }
 
-        // GET /:id (get a todo)
-        todo.get { (request: Request, id: Int) in
-            guard let todo = todoStore.get(id: id) else {
-                return Response(status: .notFound)
-            }
-            return Response(content: todo)
-        }
+    // DELETE / (delete all todos)
+    func clear(request: Request) throws -> Response {
+        let deleted = store.clear()
+        return Response(content: deleted)
+    }
 
-        // PATCH /:id (modify a todo)
-        todo.patch { (request: Request, id: Int, update: StructuredData) in
-            guard let oldTodo = todoStore.get(id: id) else {
-                return Response(status: .notFound)
-            }
-            let newTodo = todoStore.update(id: id, todo: oldTodo.item.update(content: update))
-            return Response(content: newTodo)
-        }
-
-        // DELETE /:id (delete a todo)
-        todo.delete { (request: Request, id: Int) in
-            guard let removed = todoStore.remove(id: id) else {
-                return Response(status: .noContent)
-            }
-            return Response(content: removed)
-        }
+    func custom(routes: ResourceRoutes) {
+        routes.delete(respond: clear)
 
         // OPTIONS /
-        todo.options { request in
+        routes.options { request in
             return Response(headers: [
-                "Access-Control-Allow-Headers": "accept, content-type",
                 "Access-Control-Allow-Methods": "OPTIONS,GET,POST,DELETE"
             ])
         }
 
         // OPTIONS /:id
-        todo.options("/:id") { request in
+        routes.options("/:id") { request in
             return Response(headers: [
-                 "Access-Control-Allow-Headers": "accept, content-type",
-                 "Access-Control-Allow-Methods": "OPTIONS,GET,PATCH,DELETE"
+                "Access-Control-Allow-Methods": "OPTIONS,GET,PATCH,DELETE"
             ])
         }
     }

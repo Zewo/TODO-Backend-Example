@@ -1,5 +1,5 @@
 # Todo Backend
-[![Swift 3.0](https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Zewo](https://img.shields.io/badge/Zewo-0.7-FF7565.svg?style=flat)](http://zewo.io) [![Platforms Mac - Linux](https://img.shields.io/badge/Platforms-OS%20X%20--%20Linux-lightgray.svg?style=flat)](https://developer.apple.com/swift/) [![License MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)](https://tldrlegal.com/license/mit-license) [![Slack Status](https://zewo-slackin.herokuapp.com/badge.svg)](http://slack.zewo.io)
+[![Swift 3.0](https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Zewo](https://img.shields.io/badge/Zewo-0.14-FF7565.svg?style=flat)](http://zewo.io) [![Platforms Mac - Linux](https://img.shields.io/badge/Platforms-OS%20X%20--%20Linux-lightgray.svg?style=flat)](https://developer.apple.com/swift/) [![License MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)](https://tldrlegal.com/license/mit-license) [![Slack Status](https://zewo-slackin.herokuapp.com/badge.svg)](http://slack.zewo.io)
 
 This repository contains an implementation of Todo Backend created using Zewo components.
 

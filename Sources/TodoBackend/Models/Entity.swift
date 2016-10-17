@@ -22,9 +22,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import StructuredData
+import Axis
 
-struct Entity<Item: StructuredDataConvertible> {
+struct Entity<Item> where Item : MapInitializable, Item : MapRepresentable {
     let id: Int
     let url: String
     let item: Item
@@ -36,19 +36,19 @@ struct Entity<Item: StructuredDataConvertible> {
     }
 }
 
-extension Entity: StructuredDataConvertible {
-    var structuredData: StructuredData {
-        var dict = item.structuredData.dictionaryValue!
-        dict["id"] = .infer(id)
-        dict["url"] = .infer(url)
-        return .infer(dict)
+extension Entity : MapInitializable, MapRepresentable {
+    var map: Map {
+        var dict = item.map.dictionary!
+        dict["id"] = Map(id)
+        dict["url"] = Map(url)
+        return Map(dict)
     }
 
-    init(structuredData data: StructuredData) throws {
+    init(map: Map) throws {
         try self.init(
-            id: data.get("id"),
-            url: data.get("url"),
-            item: data.get()
+            id: map.get("id"),
+            url: map.get("url"),
+            item: map.get()
         )
     }
 }

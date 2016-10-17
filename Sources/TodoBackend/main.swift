@@ -23,28 +23,25 @@
 // SOFTWARE.
 
 import HTTPServer
-import Router
-import LogMiddleware
+import POSIX
 
 // Configuration
-let apiRoot = getenv("API_ROOT") == nil
-    ? "http://127.0.0.1:8080/" // if API_ROOT is not defined, default to localhost
-    : String(validatingUTF8: getenv("API_ROOT"))!
+let apiRoot = environment["API_ROOT"] ?? "http://127.0.0.1:8080/"
 
 // Middleware
 let cors = CORSMiddleware()
-let log = LogMiddleware(logger: Logger())
+let log = LogMiddleware()
 
 // Storage
 let store = InMemoryTodoStore()
 
 // Resources
-let todoResource = makeTodoResource(store: store)
+let todoResource = TodoResource(store: store)
 
 // Main router
-let router = Router(middleware: cors) { route in
-    route.compose("/", router: todoResource)
+let router = BasicRouter(middleware: [log, cors]) { route in
+    route.compose("/", resource: todoResource)
 }
 
 // Server
-try Server(middleware: log, responder: router).start()
+try Server(responder: router).start()

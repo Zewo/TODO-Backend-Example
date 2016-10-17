@@ -22,12 +22,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import S4
+import HTTP
 
-struct CORSMiddleware: Middleware {
+struct CORSMiddleware : Middleware {
     func respond(to request: Request, chainingTo chain: Responder) throws -> Response {
         var response = try chain.respond(to: request)
-        response.headers.headers["access-control-allow-origin"] = "*"
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "accept, content-type"
         return response
     }
 }
