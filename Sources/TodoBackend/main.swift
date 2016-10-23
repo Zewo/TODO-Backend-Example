@@ -2,17 +2,20 @@ import HTTPServer
 import POSIX
 
 // Configuration
-let apiRoot = environment["API_ROOT"] ?? "http://127.0.0.1:8080/"
+let apiRoot = environment["API_ROOT"] ?? "http://localhost:8080/"
+let pqHost = environment["POSTGRESQL_HOST"] ?? "localhost"
+let pqPort = Int(environment["POSTGRESQL_PORT"] ?? "5432")!
 
 // Middleware
 let cors = CORSMiddleware()
 let log = LogMiddleware()
 
 // Storage
-let store = InMemoryTodoStore()
+//let store = InMemoryTodoStore()
+let store = try PostgreSQLTodoStore(info: .init(host: pqHost, port: pqPort, databaseName: "todo-backend"))
 
 // Resources
-let todoResource = TodoResource(store: store)
+let todoResource = TodoResource(store: store, root: apiRoot)
 
 // Main router
 let router = BasicRouter(middleware: [log, cors]) { route in

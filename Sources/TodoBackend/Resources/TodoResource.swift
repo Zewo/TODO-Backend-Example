@@ -2,23 +2,32 @@ import HTTPServer
 
 struct TodoResource : Resource {
     let store: TodoStore
-    let middleware: [Middleware] = [ContentNegotiationMiddleware(mediaTypes: [.json])]
+    let middleware: [Middleware]
+
+    init(store: TodoStore, root: String) {
+        // append todo's url to response content
+        let url = TodoURLMiddleware(root: apiRoot)
+        // convert map <-> json
+        let contentNegotiation = ContentNegotiationMiddleware(mediaTypes: [.json])
+        self.middleware = [contentNegotiation, url]
+        self.store = store
+    }
 
     // GET / (get all todos)
     func list(request: Request) throws -> Response {
-        let todos = store.getAll()
+        let todos = try store.getAll()
         return try Response(content: todos)
     }
 
     // POST / (create a new todo)
     func create(request: Request, content todo: Todo) throws -> Response {
-        let inserted = store.insert(todo: todo)
+        let inserted = try store.insert(todo: todo)
         return try Response(content: inserted)
     }
 
     // GET /:id (get a todo)
     func detail(request: Request, id: Int) throws -> Response {
-        guard let todo = store.get(id: id) else {
+        guard let todo = try store.get(id: id) else {
             return Response(status: .notFound)
         }
         return try Response(content: todo)
@@ -26,16 +35,16 @@ struct TodoResource : Resource {
 
     // PATCH /:id (modify a todo)
     func update(request: Request, id: Int, content update: Map) throws -> Response {
-        guard let oldTodo = store.get(id: id) else {
+        guard let oldTodo = try store.get(id: id) else {
             return Response(status: .notFound)
         }
-        let newTodo = store.update(id: id, todo: oldTodo.item.update(map: update))
+        let newTodo = try store.update(id: id, todo: oldTodo.model.update(map: update))
         return try Response(content: newTodo)
     }
 
     // DELETE /:id (delete a todo)
     func destroy(request: Request, id: Int) throws -> Response {
-        guard let removed = store.remove(id: id) else {
+        guard let removed = try store.remove(id: id) else {
             return Response(status: .noContent)
         }
         return try Response(content: removed)
@@ -43,7 +52,7 @@ struct TodoResource : Resource {
 
     // DELETE / (delete all todos)
     func clear(request: Request) throws -> Response {
-        let deleted = store.clear()
+        let deleted = try store.clear()
         return try Response(content: deleted)
     }
 
