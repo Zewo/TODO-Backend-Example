@@ -3,6 +3,7 @@ import POSIX
 
 // Configuration
 let apiRoot = environment["API_ROOT"] ?? "http://localhost:8080/"
+let usePq = environment["USE_POSTGRESQL"] == "true"
 let pqHost = environment["POSTGRESQL_HOST"] ?? "localhost"
 let pqPort = Int(environment["POSTGRESQL_PORT"] ?? "5432")!
 
@@ -11,8 +12,9 @@ let cors = CORSMiddleware()
 let log = LogMiddleware()
 
 // Storage
-//let store = InMemoryTodoStore()
-let store = try PostgreSQLTodoStore(info: .init(host: pqHost, port: pqPort, databaseName: "todo-backend"))
+let store: TodoStore = usePq
+    ? try PostgreSQLTodoStore(info: .init(host: pqHost, port: pqPort, databaseName: "todo-backend"))
+    : InMemoryTodoStore()
 
 // Resources
 let todoResource = TodoResource(store: store, root: apiRoot)
