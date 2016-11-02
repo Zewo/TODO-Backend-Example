@@ -1,6 +1,7 @@
 import SQL
 import Axis
 
+//TODO: Add to Zewo/SQL
 extension PersistedEntity : MapConvertible {
     public init(map: Map) throws {
         try self.init(
