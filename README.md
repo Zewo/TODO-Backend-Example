@@ -9,19 +9,19 @@ This repository contains an implementation of Todo Backend created using Zewo co
 The application is split up into three components: [Models](https://github.com/Zewo/TodoBackend/tree/master/Sources/TodoBackend/Models), [Resources](https://github.com/Zewo/TodoBackend/tree/master/Sources/TodoBackend/Resources), and [Storage](https://github.com/Zewo/TodoBackend/tree/master/Sources/TodoBackend/Storage).
 
 ### Models
-The `Models` directory contains the bare minimum for the Todo model and avoids giving it state/optionality by abstracting its "entity" behavior (`id`, `url`) in an Entity wrapper struct. The (fairly concise) boilerplate for serializing and instantiating the structs from and to [`StructuredData`](https://github.com/Zewo/StructuredData), which is then transparently converted to the correct data type for the API (in this case, JSON) by the resource.
+The `Models` directory contains the bare minimum for the Todo model and avoids giving it state/optionality by abstracting its "entity" behavior (`id`, `url`) in `Entity` (from [SQL](https://github.com/Zewo/SQL)) and `TodoURLMiddleware`. There is also a conformance to `ModelProtocol` which describes what `Todo` looks like in a database, giving it access to the [SQL](https://github.com/Zewo/SQL) ORM.
 
 ### Resources
-The resources directory contains a single resource which defines all of the routes. Since most of the hard work (serializing our models to and from JSON) is done by the [Resource]([Resource](https://github.com/Zewo/Resource)) module, the rest of the code is just glue that interacts with the data store.
+The resources directory contains a single resource which defines all of the routes. Most of the hard work (defining the routes, converting to and from JSON) is done by Zewo modules, the code inside the resource is just glue that interacts with the data store.
 
 ### Storage
-For Storage, we define a `TodoStore` protocol which defines the necessary methods for interacting with a data store (fetch, insert, update, remove). A simple in-memory implementation of the protocol is included which just uses a dictionary for storage.
+For Storage, we define a `TodoStore` protocol which defines the necessary methods for interacting with a data store (fetch, insert, update, remove). A simple in-memory implementation of the protocol is included which just uses a dictionary for storage, which is nice when developing. The real data store is of course PostgreSQL, communication with which is implemented in `PostgreSQLTodoStore`.
 
 Thanks to this architecture, our application's code is simple to understand, boilerplate-free, and highly maintainable. While this is by no means a perfect architecture, it can be a good example to follow for your own application.
 
 ## Setup
 ### Setting up the environment
-You can follow the setup instructions for Zewo in the [main readme](https://github.com/Zewo/Zewo). In short, just install the 05-09 Swift development snapshot.
+You can follow the setup instructions for Zewo in the [main readme](https://github.com/Zewo/Zewo).
 
 ### Running the project locally
 Simply clone this repository (`git clone https://github.com/Zewo/TodoBackend.git`) and run `swift build`. Once the build process finishes, an executable for the application should pop up at `.build/debug/TodoBackend`.
@@ -29,9 +29,15 @@ Simply clone this repository (`git clone https://github.com/Zewo/TodoBackend.git
 ### Deploying the project with Docker
 To begin, clone the repository (`git clone https://github.com/Zewo/TodoBackend.git`) and [install Docker](https://docs.docker.com/engine/installation/).
 
-There is a basic Dockerfile in the root of the repository that installs Swift, builds the application, and runs it. Before you can use it, however, you need to set the [API_ROOT](https://github.com/Zewo/TodoBackend/blob/master/Dockerfile#L7) environmental variable to the full url at which it will be deployed (for example, `https://myapi.com/`).
+#### Basic Deployment
+There is a simple Dockerfile in the root of the repository that installs Swift, builds the application, and runs it.
 
-Once you have the Dockerfile configured, build the docker image (`docker build -t zewo/todobackend .`). With the image built, run it using the [`docker run`](https://docs.docker.com/engine/reference/run/) family of commands. For example, `docker run -itd -p 0.0.0.0:80:8080 zewo/todobackend` will start a container running the Todo Backend application in the background, and map the containers `8080` port to the machine's `80` (default http) port.
+Once you have the Dockerfile configured, build the docker image (`docker build -t zewo/todobackend .`). With the image built, run it using the [`docker run`](https://docs.docker.com/engine/reference/run/) family of commands. For example, `docker run -itd -e API_ROOT="http://localhost:8080/" -p 80:8080 zewo/todobackend` will start a container running the Todo Backend application in the background, and map the containers `8080` port to the machine's `80` (default http) port.
+
+#### Docker Compose
+When deploying the application to production, you want to store the todos in a real database. With Docker, the recommended way to do this is to use Docker Compose which runs multiple docker containers and allows them to communicate.
+
+Included in the repository is an example configuration (`docker-compose.yml`). The configuration does need to be adjusted depending on the ip of the deployed application (change the environmental variable API_ROOT). Afterwards, you just need to run `docker-compose up` and Docker handles the rest.
 
 ## Support
 If you need any help you can join our [Slack](http://slack.zewo.io) and go to the **#help** channel. Or you can create a Github [issue](https://github.com/Zewo/Zewo/issues/new) in our main repository. When stating your issue be sure to add enough details, specify what module is causing the problem and reproduction steps.

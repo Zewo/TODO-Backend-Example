@@ -1,0 +1,21 @@
+version: '2'
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=zewo
+      - POSTGRES_PASSWORD=zewo
+      - POSTGRES_DB=todo-backend
+  web:
+    build: .
+    ports:
+      - "80:8080"
+    depends_on:
+      - db
+    environment:
+      - API_ROOT=http://192.241.216.190/
+      - USE_POSTGRES=true
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=zewo
+      - POSTGRES_PASS=zewo

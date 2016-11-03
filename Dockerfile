@@ -3,9 +3,9 @@ MAINTAINER Dan Appel <dan.appel00@gmail.com>
 
 # setup swift
 RUN swiftenv install 3.0
+# download postgresql adapter
+RUN apt-get install -y libpq-dev
 
-# If not set, app defaults to localhost:8080/
-#ENV API_ROOT=MY_API_ROOT
 ENV APP=TodoBackend
 
 RUN mkdir /$APP
@@ -13,7 +13,7 @@ WORKDIR /$APP
 
 ADD . .
 
-RUN swift build -c release
+RUN swift build -c release -Xcc -I/usr/include/postgresql
 
 EXPOSE 8080
 
